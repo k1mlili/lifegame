@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>JS Bin</title>
+    <style>
+        .cell {
+            display: inline-block;
+            border: 1px solid white;
+            background-color: lightgray;
+            width: 10px;
+            height: 10px;
+            margin: 0px 0px;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-image: url('frame.jpg');
+        }
+
+        .Button {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        button {
+            border: none;
+            /*1px solid black;*/
+            border-radius: 50%;
+            margin: 20px;
+            width: 80px;
+            height: 80px;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .Button button:nth-child(1) {
+            font-size: 15px;
+            background-color: red;
+            background-image: url('img1.png');
+        }
+
+        .Button button:nth-child(2) {
+            background-color: green;
+            background-image: url('img2.png');
+        }
+
+        .Button button:nth-child(3) {
+            background-color: blue;
+            background-image: url('img3.png');
+        }
+
+        .Button button:nth-child(4) {
+            background-color: orange;
+            background-image: url('img4.png');
+        }
+
+        button:hover {
+            cursor: pointer;
+            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(4px);
+            transform: scale(0.95);
+        }
+
+        body {
+            background-image: url(./frame.jpg);
+            background-repeat: no-repeat;
+            background-size: auto;
+            background-position-x: 65%;
+            background-position-y: top;
+        }
+        #name{
+            text-align: center;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            margin-top: 10px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        const size = 20;
+        const arraySize = size * size;
+        const neighbor = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+        var curr = Array(arraySize);
+        curr.fill(0);
+        var next = Array(arraySize);
+
+        function Toggle(element, id) {
+            if (element.style.backgroundColor == 'gray') {
+                element.style.backgroundColor = 'lightgray';
+                curr[parseInt(id)] = 0;
+            }
+            else {
+                element.style.backgroundColor = 'gray';
+                curr[parseInt(id)] = 1;
+            }
+        }
+
+
+
+        function nextState(id) {
+            const i = parseInt(id / size);
+            const j = id % size;
+            let count = 0;
+            for (let k = 0; k < 8; k++) {
+                const ii = i + neighbor[k][0];
+                const jj = j + neighbor[k][1];
+                if (ii < 0 || ii >= size) {
+                    continue;
+                }
+                if (jj < 0 || jj >= size) {
+                    continue;
+                }
+                if (curr[ii * size + jj] == 1) {
+                    count++;
+                }
+            }
+            if (curr[i * size + j] == 1 && (count == 2 || count == 3)) {
+                return 1;
+            }
+            if (curr[i * size + j] == 0 && count == 3) {
+                return 1;
+            }
+            return 0;
+        }
+
+        function NextGeneration() {
+            console.log(curr);
+            for (let id = 0; id < arraySize; id++) {
+                next[id] = nextState(id);
+            }
+            for (let id = 0; id < arraySize; id++) {
+                curr[id] = next[id];
+            }
+            drawWorld();
+        }
+
+        function drawWorld() {
+            for (let id = 0; id < arraySize; id++) {
+                element = document.getElementById(String(id));
+                if (curr[id]) {
+                    element.style.backgroundColor = "gray";
+                }
+                else {
+                    element.style.backgroundColor = "lightgray";
+                }
+            }
+        }
+
+        function clearWorld() {
+            curr.fill(0);
+            drawWorld();
+        }
+    </script>
+</head>
+
+<body>
+    <div>
+        <h1 style="text-align: center;">Life Game</h1>
+        <p id="name">20223096 김일승</p>
+    </div>
+    <hr/>
+
+    <div class="Button">
+        <button onclick="clearWorld()">(Nu)clear</button>
+        <button onclick="clearInterval(myInterval)">stop</button>
+        <button onclick="NextGeneration()">next</button>
+        <button onclick="myInterval = setInterval(NextGeneration, 300);">start</button>
+    </div>
+
+    <div style="line-height: 10px;" class="container">
+        <script>
+            for (i = 0; i < size; i++) {
+                for (j = 0; j < size; j++) {
+                    id = i * size + j;
+                    document.write(`<div class=cell id = ${id} onclick="Toggle(this, '${id}');"></div>`);
+                }
+                document.write("<br/>");
+            }
+        </script>
+    </div>
+
+</body>
+
+</html>
